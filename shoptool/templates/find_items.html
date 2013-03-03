@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Bootstrap -->
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+    	<link type="text/css" rel="stylesheet" href="/static/stylesheets/main.css" />
+    	<title>amartyasengupta</title>
+    	<script type="text/javascript" src="//use.typekit.net/eba8mbj.js"></script>
+		<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-35201804-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>
+	</head>
+	<body>
+		<div class="default_container">
+			
+			<!-- Top page elements -->
+			<div class="navbar">
+				<div class="navbar-inner">
+					<a class="brand" href="{{ url_for('find_items') }}">shoptool</a>
+				</div>
+	  		</div>
+	  		{% for message in get_flashed_messages() %}
+				<div class=flash>{{ message }}</div>
+			{% endfor %}
+			
+			<div class="Title"><h1>Find Items</h1></div>
+
+
+			<!-- Search form -->
+			<form action="{{ url_for('find_items') }}" method=post class=add-entry>
+				<dl>
+					<dt>Category:
+					<dd><input type=text size=30 name=category>
+					<dt>Min price:
+					<dd><input type=text size=30 name=price_min>
+					<dt>Max price:
+					<dd><input type=text size=30 name=price_max>
+					<dd><input type=submit value="Go">
+				</dl>
+			</form>
+
+
+			<!-- Items -->
+			<h3>Items</h3>
+			TODO...
+		</div>
+	</body>
+</html>
+
+
+
+
+

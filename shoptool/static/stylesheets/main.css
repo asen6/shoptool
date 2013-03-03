@@ -1,0 +1,164 @@
+
+/***********************************
+*		General
+************************************/
+
+body {
+}
+
+.default_container{
+	width:76%;
+	margin-left: 12%;
+	margin-right: 12%;
+	margin-top: 20px;
+	margin-bottom: 40px;
+	/*font-family: Verdana, Helvetica, sans-serif;
+	font-size:14px;
+	color:4C4C4D;*/
+}
+
+.content-section{
+	margin-bottom:30px;
+}
+
+.center{
+	text-align: center;
+}
+
+.clear {
+  height:1em;
+  clear:both;
+}
+
+/***********************************
+*		Bio
+************************************/
+
+
+
+/***********************************
+*		Writings
+************************************/
+
+.posts{
+}
+
+.post{
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+.post_title{
+}
+
+.post_title a{
+	text-decoration:none;
+}
+
+.post_date{
+}
+
+.writing_title{
+	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
+	font-size:30px;
+	font-weight:600;
+}
+
+.writing_date{
+	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
+	font-size:12px;
+	font-style:bold;
+	font-weight:300;
+	margin-bottom:30px;
+}
+
+.writing_content{
+	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
+	font-size:16px;
+	font-weight:400;
+}
+
+.writing_quote blockquote p{
+	margin-bottom: 10px;
+}
+
+/***********************************
+*		Projects
+************************************/
+
+.projects{}
+
+.project{
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+.project_title a{
+	text-decoration:none;
+}
+
+.project_title{}
+
+.project_lastupdate{}
+
+
+/***********************************
+*		Responsive
+************************************/
+
+/* Large desktop */
+@media (min-width: 1200px) {
+	
+	/* General */
+	/* Bio */
+	/* Writings */
+	/* Projects */
+}
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {
+	
+	/* General */
+	/* Bio */
+	/* Writings */
+	/* Projects */
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+	
+	/* General */
+	/* Bio */
+
+	#bio_social_links {
+		text-align: center;
+	}
+
+	/* Writings */
+	/* Projects */
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+	
+	/* General */
+
+	body {
+		margin-left: 1%;
+		margin-right: 1%;
+	}
+
+	/* Bio */
+
+	#bio_social_links {
+		text-align: left;
+		margin-left: 10px;
+	}
+
+	/* Writings */
+	/* Projects */
+}
+
+
+
+
