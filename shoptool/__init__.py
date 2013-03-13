@@ -13,8 +13,8 @@ class gilt_sale(db.Model):
 	sale_url = db.Column(db.Text)
 	gilt_store_key = db.Column(db.String(20))
 	description = db.Column(db.Text)
-	begins = db.Column(db.String(60))
-	ends = db.Column(db.String(60))
+	begins = db.Column(db.DateTime)
+	ends = db.Column(db.DateTime)
 	products = db.relationship('gilt_product', backref='gilt_sale', lazy='select')
 
 	def __init__(self, gilt_sale_key, sale_name, sale_url, gilt_store_key, description, begins, ends):
@@ -31,7 +31,7 @@ class gilt_sale(db.Model):
 
 class gilt_product(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	gilt_product_id = db.Column(db.String(60))
+	gilt_product_id = db.Column(db.Integer)
 	name = db.Column(db.String(120))
 	product = db.Column(db.Text)
 	brand = db.Column(db.String(120))
@@ -72,12 +72,12 @@ class gilt_category(db.Model):
 		self.gilt_product_id = gilt_product_id
 
 	def __repr__(self):
-		return '<Category %r>' % self.name
+		return '<Category %r>' % self.gilt_category
 
 class gilt_image_url(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	width = db.Column(db.String(10))
-	height = db.Column(db.String(10))
+	width = db.Column(db.Integer)
+	height = db.Column(db.Integer)
 	url = db.Column(db.Text)
 	gilt_product_id = db.Column(db.Integer, db.ForeignKey('gilt_product.id'))
 	image_listing_position = db.Column(db.Integer)
@@ -96,9 +96,9 @@ class gilt_sku(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	gilt_sku_id = db.Column(db.Integer)
 	inventory_status = db.Column(db.String(60))
-	msrp_price = db.Column(db.String(20))
-	sale_price = db.Column(db.String(20))
-	shipping_surcharge = db.Column(db.String(20))
+	msrp_price = db.Column(db.Float)
+	sale_price = db.Column(db.Float)
+	shipping_surcharge = db.Column(db.Float)
 	color = db.Column(db.String(40))
 	size = db.Column(db.String(20))
 	# attributes ?

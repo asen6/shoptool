@@ -1,19 +1,70 @@
 from shoptool import app, db, gilt_sale, gilt_product, gilt_category, gilt_image_url, gilt_sku
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-	render_template, flash, _app_ctx_stack
+	render_template, flash, _app_ctx_stack, jsonify, json
 from datetime import datetime
-from sqlalchemy import and_
+from sqlalchemy import and_, func
+from sqlalchemy.orm import joinedload, contains_eager
 import time
 import requests
 import json
+import dateutil.parser
 
 
 # Home page
 
-@app.route('/')
-def find_items():
-	return render_template('find_items.html')
+@app.route('/', methods=['GET', 'POST'])
+def index():
+	available_categories = get_available_categories()
+	return render_template('index.html', available_categories=available_categories)
 
+def get_available_categories():
+	available_categories = db.session.query(gilt_category).\
+										group_by(gilt_category.gilt_category).\
+										order_by(gilt_category.gilt_category).\
+										all()
+	return available_categories
+
+@app.route('/test_json/', methods=['GET'])
+def test_json():
+	random_something = 'something'
+	return jsonify(username=random_something)
+
+@app.route('/get_products/', methods=['GET'])
+def get_items():
+	category = request.args.get('category', '')
+	min_price = request.args.get('min_price', '')
+	max_price = request.args.get('max_price', '')
+	current_time = datetime.now()
+
+	products = []
+	product_ids = []
+	for product, image_url, sku in db.session.query(gilt_product, gilt_image_url, gilt_sku).\
+								join(gilt_category).\
+								join(gilt_sale).\
+								filter(gilt_product.id==gilt_image_url.gilt_product_id).\
+								filter(gilt_product.id==gilt_sku.gilt_product_id).\
+								filter(gilt_category.gilt_category==category).\
+								filter(gilt_sale.begins<current_time).\
+								filter(gilt_sale.ends>current_time).\
+								filter(gilt_sku.inventory_status=='for sale').\
+								filter(gilt_sku.sale_price>=min_price).\
+								filter(gilt_sku.sale_price<=max_price).\
+								all():
+		
+		curr_product_dict = {'id': product.id
+								, 'name': product.name
+								, 'url': product.product_url
+								, 'brand': product.brand
+								, 'description': product.description
+								, 'msrp_price': sku.msrp_price
+								, 'sale_price': sku.sale_price
+								, 'image_url': image_url.url
+								, 'image_width': image_url.width
+								, 'image_height': image_url.height
+								, 'retailer': 'Gilt'
+							}
+		products.append(curr_product_dict)
+	return jsonify(products=products)
 
 @app.route('/refresh_gilt_data/')
 def refresh_gilt():
@@ -30,13 +81,19 @@ def refresh_gilt():
 			new_sale_id = missing.id
 			print 'sale not added (already exists): ' + str(new_sale_id)
 		else:
+			begins = None
+			ends = None
+			if sale.get('begins') is not None:
+				begins = dateutil.parser.parse(sale.get('begins'), ignoretz=True)
+			if sale.get('ends') is not None:
+				ends= dateutil.parser.parse(sale.get('ends'), ignoretz=True)
 			new_sale = gilt_sale(sale.get('sale_key')
 									, sale.get('name')
 									, sale.get('sale_url')
 									, sale.get('store')
 									, sale.get('description')
-									, sale.get('begins')
-									, sale.get('ends'))
+									, begins
+									, ends)
 			db.session.add(new_sale)
 			db.session.commit()
 			new_sale_id = new_sale.id
@@ -52,7 +109,10 @@ def refresh_gilt():
 				continue
 			r_product = requests.get(product + apikeystring)
 			product_data = json.loads(r_product.text)
-			new_product = gilt_product(product_data.get('id')
+			product_id_value = None
+			if product_data.get('id') is not None:
+				product_id_value = int(float(product_data.get('id')))
+			new_product = gilt_product(product_id_value
 										, product_data.get('name')
 										, product_data.get('product')
 										, product_data.get('brand')
@@ -95,8 +155,14 @@ def refresh_gilt():
 							if missing is not None:
 								print '----> image_url not added (already exists): ' + str(missing.id)
 								continue
-							new_image_url = gilt_image_url(image.get('width')
-															, image.get('height')
+							width = None
+							height = None
+							if image.get('width') is not None:
+								width = int(float(image.get('width')))
+							if image.get('height') is not None:
+								height = int(float(image.get('width')))
+							new_image_url = gilt_image_url(width
+															, height
 															, curr_url
 															, new_product_id
 															, image_listing_position)
@@ -114,6 +180,15 @@ def refresh_gilt():
 					if missing is not None:
 						print '----> sku not added (already exists): ' + str(missing.id)
 						continue
+					msrp_price = None
+					sale_price = None
+					shipping_surcharge = None
+					if sku.get('msrp_price') is not None:
+						msrp_price = float(sku.get('msrp_price'))
+					if sku.get('sale_price') is not None:
+						sale_price = float(sku.get('sale_price'))
+					if sku.get('shipping_surcharge') is not None:
+						shipping_surcharge = float(sku.get('shipping_surcharge'))
 					# get attributes
 					color = None
 					size = None
@@ -125,9 +200,9 @@ def refresh_gilt():
 								size = attribute.get('value')
 					new_sku = gilt_sku(sku.get('id')
 										, sku.get('inventory_status')
-										, sku.get('msrp_price')
-										, sku.get('sale_price')
-										, sku.get('shipping_surcharge')
+										, msrp_price
+										, sale_price
+										, shipping_surcharge
 										, color
 										, size
 										, new_product_id)
@@ -142,4 +217,16 @@ def refresh_gilt():
 
 def update_product(product_id, product_object):
 	# TODO
+	# Including set an image as primary image --> Then feed this into the get_products stuff
+	# Same with skus
+	# Including updating inventory status
 	return
+
+
+
+
+
+
+
+
+

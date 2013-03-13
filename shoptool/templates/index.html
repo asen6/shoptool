@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Bootstrap -->
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+    	<link type="text/css" rel="stylesheet" href="/static/stylesheets/main.css" />
+    	<title>amartyasengupta</title>
+		<!-- Javascript -->
+		<script src="/static/js/jquery-1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/index.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/js/product.js" type="text/javascript" charset="utf-8"></script>
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-35201804-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>
+	</head>
+	<body>
+		<div class="shoptool_container">
+			<!-- Top page elements -->
+			<div class="navbar navbar-fixed-top navbar-inverse">
+				<div class="navbar-inner shoptool-navbar-inner">
+					<a class="brand" href="{{ url_for('index') }}"><strong>DJT</strong>hriftee</a>
+				</div>
+	  		</div>
+	  		{% if error %}
+	  			<h1> Error: {{ error }}</h1>
+	  		{% endif %}
+	  		{% for message in get_flashed_messages() %}
+				<div class=flash>{{ message }}</div>
+			{% endfor %}
+			
+			
+			<!-- Search form -->
+			<div class="search_container">
+				<div class="Title"><h1>Find Products</h1></div>
+				<div class="controls">
+					<select id="input_category" class="span4" placeholder="Category">>
+						{% if available_categories %}
+						{% for category in available_categories %}
+							<option>{{ category.gilt_category }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+				<div class="controls controls-row">
+					<input class="span2" id="input_min_price" type="text" placeholder="Minimum price">
+					<input class="span2" id="input_max_price" type="text" placeholder="Maximum price">
+				</div>
+				<div><button id="get_products_btn" type="submit" class="btn">Go</button></div>
+			</div>
+
+
+			<!-- Items -->
+			<div class="products_container">
+				<div id="products"></div>
+				<div id="empty_product_list_text">No products found</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+
+
+
+

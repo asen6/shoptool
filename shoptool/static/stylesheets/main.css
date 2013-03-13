@@ -4,6 +4,7 @@
 ************************************/
 
 body {
+	background-color: #F0F0F0;
 }
 
 .default_container{
@@ -29,6 +30,69 @@ body {
   height:1em;
   clear:both;
 }
+
+/***********************************
+*		Shoptool
+************************************/
+
+.shoptool-navbar-inner{
+	/*padding-left:10px;*/
+}
+
+.shoptool_container{
+	/*font-family: Verdana, Helvetica, sans-serif;
+	font-size:14px;
+	color:4C4C4D;*/
+}
+
+.search_container{
+	width:100%;
+	margin-top: 20px;
+	padding-left: 12%;
+	padding-right: 12%;
+	padding-top:20px;
+	padding-bottom:20px;
+	background-color: #DBDBDB;
+}
+
+.products_container{
+	width:100%;
+	padding-left: 12%;
+	padding-right: 12%;
+	padding-top:20px;
+	padding-bottom:20px;
+}
+
+#products{}
+
+.product{}
+
+.product_picture{}
+
+.product_brand{
+	font-size:12px;
+	font-style:italic;
+}
+
+.product_name{}
+
+.product_sale_price{
+	font-size:16px;
+}
+
+.product_msrp_price{
+	font-size:12px;
+	text-decoration: line-through;
+}
+
+.product_retailer{}
+
+
+
+
+
+
+
 
 /***********************************
 *		Bio
