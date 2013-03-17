@@ -35,19 +35,20 @@ body {
 *		Shoptool
 ************************************/
 
+.shoptool-navbar{}
+
 .shoptool-navbar-inner{
-	/*padding-left:10px;*/
+	padding-left:10px;
 }
 
-.shoptool_container{
-	/*font-family: Verdana, Helvetica, sans-serif;
+.shoptool_content_container{
+	font-family: Gill Sans, Verdana, sans-serif;
 	font-size:14px;
-	color:4C4C4D;*/
+	color:4C4C4D;
 }
 
 .search_container{
-	width:100%;
-	margin-top: 20px;
+	/*margin-top: 20px;*/
 	padding-left: 12%;
 	padding-right: 12%;
 	padding-top:20px;
@@ -56,7 +57,6 @@ body {
 }
 
 .products_container{
-	width:100%;
 	padding-left: 12%;
 	padding-right: 12%;
 	padding-top:20px;
@@ -92,80 +92,6 @@ body {
 
 
 
-
-
-/***********************************
-*		Bio
-************************************/
-
-
-
-/***********************************
-*		Writings
-************************************/
-
-.posts{
-}
-
-.post{
-	margin-top:10px;
-	margin-bottom:10px;
-}
-
-.post_title{
-}
-
-.post_title a{
-	text-decoration:none;
-}
-
-.post_date{
-}
-
-.writing_title{
-	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
-	font-size:30px;
-	font-weight:600;
-}
-
-.writing_date{
-	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
-	font-size:12px;
-	font-style:bold;
-	font-weight:300;
-	margin-bottom:30px;
-}
-
-.writing_content{
-	font-family: "adobe-garamond-pro", Helvetica, sans-serif;
-	font-size:16px;
-	font-weight:400;
-}
-
-.writing_quote blockquote p{
-	margin-bottom: 10px;
-}
-
-/***********************************
-*		Projects
-************************************/
-
-.projects{}
-
-.project{
-	margin-top:10px;
-	margin-bottom:10px;
-}
-
-.project_title a{
-	text-decoration:none;
-}
-
-.project_title{}
-
-.project_lastupdate{}
-
-
 /***********************************
 *		Responsive
 ************************************/
@@ -174,53 +100,38 @@ body {
 @media (min-width: 1200px) {
 	
 	/* General */
-	/* Bio */
-	/* Writings */
-	/* Projects */
+	/* Shoptool */
+
 }
 
 /* Portrait tablet to landscape and desktop */
 @media (min-width: 768px) and (max-width: 979px) {
 	
 	/* General */
-	/* Bio */
-	/* Writings */
-	/* Projects */
+	/* Shoptool */
+	
 }
 
 /* Landscape phone to portrait tablet */
 @media (max-width: 767px) {
 	
 	/* General */
-	/* Bio */
-
-	#bio_social_links {
-		text-align: center;
+	body {
+		padding-top:0px;
 	}
-
-	/* Writings */
-	/* Projects */
+	/* Shoptool */
+	
 }
 
 /* Landscape phones and down */
 @media (max-width: 480px) {
 	
 	/* General */
-
 	body {
-		margin-left: 1%;
-		margin-right: 1%;
+		padding-top:0px;
 	}
-
-	/* Bio */
-
-	#bio_social_links {
-		text-align: left;
-		margin-left: 10px;
-	}
-
-	/* Writings */
-	/* Projects */
+	/* Shoptool */
+	
 }
 
 

@@ -6,6 +6,40 @@ app.config.from_object('config')
 # NEW
 db = SQLAlchemy(app)
 
+class AvailableProductCategory(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	retailer = db.Column(db.String(40))
+	product_id = db.Column(db.Integer)
+	name = db.Column(db.String(120))
+	category = db.Column(db.String(80))
+	brand = db.Column(db.String(120))
+	url = db.Column(db.Text)
+	description = db.Column(db.Text)
+	msrp_price = db.Column(db.Float)
+	sale_price = db.Column(db.Float)
+	image_url = db.Column(db.Text)
+	image_width = db.Column(db.Integer)
+	image_height = db.Column(db.Integer)
+	ends = db.Column(db.DateTime)
+
+	def __init__(self, retailer, product_id, name, category, brand, url, description, msrp_price, sale_price, image_url, image_width, image_height, ends):
+		self.retailer = retailer
+		self.product_id = product_id
+		self.name = name
+		self.category = category
+		self.brand = brand
+		self.url = url
+		self.description = description
+		self.msrp_price = msrp_price
+		self.sale_price = sale_price
+		self.image_url = image_url
+		self.image_width = image_width
+		self.image_height = image_height
+		self.ends = ends
+
+	def __repr__(self):
+		return '<AvailableProductCategory %r>' % self.name
+
 class gilt_sale(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	gilt_sale_key = db.Column(db.String(40), unique=True)
