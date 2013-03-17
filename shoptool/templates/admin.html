@@ -44,11 +44,22 @@
 
 			<!-- Pull in new product data and update skus -->
 			<form action="{{ url_for('pull_new_data') }}" method=post>
-				<button id="pull_new_data_btn" type="submit" class="btn">Pull in new product data and update SKUs</button>
+				<button id="pull_new_data_btn" type="submit" class="btn">Pull in new product data</button>
 			</form>
 			{% if new_product_count %}
 				{% if new_product_count!=-1 %}
 					New product count = {{ new_product_count }}
+				{% endif %}
+			{% endif %}
+
+
+			<!-- Update inventory status -->
+			<form action="{{ url_for('update_inventory_status') }}" method=post>
+				<button id="update_inventory_status_btn" type="submit" class="btn">Update inventory status</button>
+			</form>
+			{% if changed_inventory_status_count %}
+				{% if changed_inventory_status_count!=-1 %}
+					Changed inventory status count = {{ changed_inventory_status_count }}
 				{% endif %}
 			{% endif %}
 

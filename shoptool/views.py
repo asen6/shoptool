@@ -70,11 +70,15 @@ def get_items():
 
 @app.route('/admin/')
 def show_admin():
-	# TODO: Figure out how to get and show returned statuses
 	try:
 		available_products_count = request.args['available_products_count']
 	except:
 		available_products_count = -1
+
+	try:
+		changed_inventory_status_count = request.args['changed_inventory_status_count']
+	except:
+		changed_inventory_status_count = -1
 
 	try:
 		new_product_count = request.args['new_product_count']
@@ -83,10 +87,11 @@ def show_admin():
 
 	return render_template('admin.html'
 							, available_products_count=available_products_count
+							, changed_inventory_status_count=changed_inventory_status_count
 							, new_product_count=new_product_count)
 
 # TODO: Figure out how to continue on error
-# NOTE: Assuming that sale / product data will not change (except for inventory status of existing skus)
+# NOTE: Assuming that sale / product data will not change (except inventory status)
 @app.route('/admin/pull_new_data/', methods=['GET', 'POST'])
 def pull_new_data():
 	if request.method == 'POST':
@@ -95,7 +100,6 @@ def pull_new_data():
 		sales_data = json.loads(r_sales.text)
 		sale_count = 0
 		product_count = 0
-		changed_inventory_status_count = 0
 		skipped_products_count = 0
 		if sales_data.get('sales') is None:
 			return str(product_count)
@@ -132,9 +136,6 @@ def pull_new_data():
 				r_product = requests.get(product + apikeystring)
 				product_data = json.loads(r_product.text)
 				if missing is not None:
-					changed_inventory_status_count = update_inventory_status(missing.id
-																			, product_data.get('skus')
-																			, changed_inventory_status_count)
 					skipped_products_count = skipped_products_count + 1
 					if skipped_products_count % 10 == 0:
 						print 'skipped_products_count = ' + str(skipped_products_count)
@@ -229,27 +230,62 @@ def pull_new_data():
 											, size
 											, new_product_id)
 						db.session.add(new_sku)
-				db.session.commit()
 		db.session.commit()
-		print 'changed_inventory_status_count = ' + str(changed_inventory_status_count)
+		print '...total stats...'
+		print '...sale count: ' + str(sale_count)
+		print '...product count: ' + str(product_count)
+		print '...skipped_products_count: ' + str(skipped_products_count)
 		return redirect(url_for('show_admin', new_product_count=product_count))
 	else:
 		return redirect(url_for('index'))
 
-def update_inventory_status(product_id, product_data_skus, changed_inventory_status_count):
-	if product_data_skus is not None:
-		for sku in product_data_skus:
-			existing_sku = gilt_sku.query.filter(and_(gilt_sku.gilt_product_id==product_id
-												, gilt_sku.gilt_sku_id==sku.get('id'))).first()
-			if existing_sku is None:
-				continue
-			new_inventory_status = sku.get('inventory_status')
-			if new_inventory_status != existing_sku.inventory_status:
-				existing_sku.inventory_status = new_inventory_status
-				changed_inventory_status_count = changed_inventory_status_count + 1
-				print 'changed_inventory_status_count = ' + str(changed_inventory_status_count) + ' of sku ' + str(existing_sku.id) + ' to ' + new_inventory_status
-				db.session.commit()
-	return changed_inventory_status_count
+
+@app.route('/admin/update_inventory_status/', methods=['GET', 'POST'])
+def update_inventory_status():
+	if request.method == 'POST':
+		
+		apikeystring = '?apikey=ad7a38056f0a95dc24d6dfaa0fe3e0a5'
+		r_sales = requests.get('https://api.gilt.com/v1/sales/men/active.json' + apikeystring)
+		sales_data = json.loads(r_sales.text)
+		sale_count = 0
+		product_count = 0
+		sku_count = 0
+		changed_inventory_status_count = 0
+
+		if sales_data.get('sales') is not None:
+			for sale in sales_data.get('sales'):
+				sale_count = sale_count + 1
+				if sale.get('products') is None:
+					continue
+				for product in sale.get('products'):
+					product_count = product_count + 1
+					if product_count % 50 == 0:
+						print 'product count = ' + str(product_count)
+					r_product = requests.get(product + apikeystring)
+					product_data = json.loads(r_product.text)
+					if product_data.get('skus') is None:
+						continue
+					for sku in product_data.get('skus'):
+						sku_count = sku_count + 1
+						gilt_sku_id = sku.get('id')
+						sku_object = db.session.query(gilt_sku).filter(gilt_sku.gilt_sku_id==gilt_sku_id).first()
+						if sku_object is None or sku.get('inventory_status') is None:
+							continue
+						current_inventory_status = sku_object.inventory_status
+						new_inventory_status = sku.get('inventory_status')
+						if current_inventory_status != new_inventory_status:
+							sku_object.inventory_status = new_inventory_status
+							changed_inventory_status_count = changed_inventory_status_count + 1
+							print 'changed_inventory_status_count = ' + str(changed_inventory_status_count) + ' of sku ' + str(sku_object.id) + ' from ' + current_inventory_status + ' to ' + new_inventory_status
+			db.session.commit()
+		print 'total stats...'
+		print '...sale count: ' + str(sale_count)
+		print '...product count: ' + str(product_count)
+		print '...sku count: ' + str(sku_count)
+		print '...changed_inventory_status_count = ' + str(changed_inventory_status_count)
+		return redirect(url_for('show_admin', changed_inventory_status_count=changed_inventory_status_count))
+	else:
+		return redirect(url_for('index'))
 
 
 @app.route('/admin/update_available_products_list/', methods=['GET', 'POST'])
