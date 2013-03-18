@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<!-- Bootstrap -->
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+		<!-- CSS -->
     	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     	<link type="text/css" rel="stylesheet" href="/static/stylesheets/main-pre-responsive.css">
@@ -27,18 +29,44 @@
 	</head>
 	<body>
 		<div class="shoptool_container">
+			
 			<!-- Top page elements -->
 			<div class="navbar navbar-fixed-top navbar-inverse shoptool-navbar">
-				<div class="navbar-inner shoptool-navbar-inner">
-					<a class="brand" href="{{ url_for('index') }}"><strong>DJT</strong>hriftee</a>
+				<div class="navbar-inner">
+					<ul class="nav pull-left">
+						<li><a class="brand" href="{{ url_for('index') }}"><strong>DJT</strong>hriftee</a></li>
+					</ul>
+					<ul class="nav pull-right">
+						<li id="login_link_area" class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" id="login_toggle">
+								login
+								<b class="caret"></b>
+							</a>
+							<div class="dropdown-menu" id="login_dropdown_menu">
+								<input id="input_email" type="text" placeholder="Email">
+								<input id="input_password" type="password" placeholder="Password">
+								<button id="login_or_register_btn" type="submit" class="btn">Login or Register</button>
+							</div>
+						</li>
+						<li id="logout_link_area"><a href="#" id="logout_link">logout</a></li>
+					</ul>
 				</div>
 	  		</div>
-	  		{% if error %}
-	  			<h1> Error: {{ error }}</h1>
-	  		{% endif %}
+
+
+	  		<!-- Flash messages -->
 	  		{% for message in get_flashed_messages() %}
 				<div class=flash>{{ message }}</div>
 			{% endfor %}
+
+
+			<!-- Login form -->
+			<!-- <br />
+			<div class="login_form">
+				<input id="input_email" type="text" placeholder="Email">
+				<input id="input_password" type="password" placeholder="Password">
+				<button id="login_or_register_btn" type="submit" class="btn">Login or Register</button>
+			</div> -->
 			
 			
 			<!-- Search form -->
@@ -66,6 +94,8 @@
 				<div id="products"></div>
 				<div id="empty_product_list_text"></div>
 			</div>
+
+
 		</div>
 	</body>
 </html>

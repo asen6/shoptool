@@ -1,13 +1,13 @@
-from shoptool import app, db, AvailableProductCategory, gilt_sale, gilt_product, gilt_category, gilt_image_url, gilt_sku
+from shoptool import app, db, User, AvailableProductCategory, gilt_sale, gilt_product, gilt_category, gilt_image_url, gilt_sku
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-	render_template, flash, _app_ctx_stack, jsonify, json
+	render_template, flash, _app_ctx_stack, jsonify, json, make_response, \
+	send_from_directory
 from datetime import datetime
 from sqlalchemy import and_, func
 from sqlalchemy.orm import joinedload, contains_eager
-import time
-import requests
-import json
-import dateutil.parser
+import time, requests, json, dateutil.parser, re, os
+
+
 
 
 # -----------------------------------
@@ -61,15 +61,140 @@ def get_items():
 		products.append(curr_product_dict)
 	return jsonify(products=products)
 
+@app.route('/favicon.ico')
+def favicon():
+	return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+# -----------------------------------
+# 		USER
+# -----------------------------------
+
+# TODO: Check if email in proper format
+@app.route('/login_or_register/', methods=['GET'])
+def login_or_register():
+	admin_email = 'a.sengupta6@gmail.com'
+	
+	# Check if already logged in
+	try:
+		user_id = int(request.cookies.get('user_id'))
+	except:
+		print 'cookie not found'
+		user_id = None
+	else:
+		print 'cookie found: ' + str(user_id)
+		result = 'failed'
+		message = 'You are already logged in'
+		return_data = {'result': result, 'message': message}
+		print message
+		return jsonify(return_data=return_data)
+
+	email = request.args.get('email', '')
+	password = request.args.get('password', '')
+
+	if is_valid_email(email) == False:
+		result = 'failed'
+		message = 'Invalid email'
+		return_data = {'result': result, 'message': message}
+		print message
+		return jsonify(return_data=return_data)
+
+	if is_valid_password(password) == False:
+		result = 'failed'
+		message = 'Invalid password'
+		return_data = {'result': result, 'message': message}
+		print message
+		return jsonify(return_data=return_data)
+
+	if email == admin_email:
+		admin = True
+		print 'admin true (0)'
+	else:
+		admin = False
+		print 'admin false (0)'
 
 
+	match_found = 0
+	for u in db.session.query(User).filter(User.email==email).all():
+		match_found = 1
+		if u.password == password:
+			user_id = u.id
+			admin = u.admin
+			print 'admin status of found object is ' + str(admin)
+			break
+
+	if match_found == 0:
+		new_user = User(None, email, password, admin)
+		db.session.add(new_user)
+		db.session.commit()
+		user_id = new_user.id
+		result = 'succeeded'
+		message = 'Registered new user'
+		print message
+		response = make_response()
+		response.set_cookie('user_id', user_id)
+		if admin == True:
+			response.set_cookie('admin', True)
+			print 'admin true'
+		return response
+	elif user_id is None:
+		result = 'failed'
+		message = 'Login failed: Incorrect password'
+		return_data = {'result': result, 'message': message}
+		print message
+		return jsonify(return_data=return_data)
+	else:
+		result = 'succeeded'
+		message = 'Login succeeded'
+		print message
+		response = make_response()
+		response.set_cookie('user_id', user_id)
+		if admin == True:
+			response.set_cookie('admin', True)
+			print 'admin true'
+		return response
+
+@app.route('/logout/', methods=['GET'])
+def logout():
+	response = make_response()
+	response.set_cookie('user_id', '', expires=0)
+	response.set_cookie('admin', '', expires=0)
+	return response
+
+def is_valid_email(email):
+	if re.match(r'[^@]+@[^@]+\.[^@]+', email):
+		return True
+	else:
+		return False
+
+def is_valid_password(password):
+	if len(password) < 4:
+		return False
+	else:
+		return True
 
 # -----------------------------------
 # 		ADMIN
 # -----------------------------------
 
+def is_admin(request):
+	try:
+		admin = request.cookies.get('admin')
+	except:
+		print 'admin cookie not found'
+		return False
+	else:
+		if admin == 'True':
+			print 'admin cookie is true'
+			return True
+		print 'admin cookie is false'
+		return False
+
 @app.route('/admin/')
 def show_admin():
+	if is_admin(request) == False:
+		return redirect(url_for('index'))
+
 	try:
 		available_products_count = request.args['available_products_count']
 	except:
@@ -94,6 +219,8 @@ def show_admin():
 # NOTE: Assuming that sale / product data will not change (except inventory status)
 @app.route('/admin/pull_new_data/', methods=['GET', 'POST'])
 def pull_new_data():
+	if is_admin(request) == False:
+		return redirect(url_for('index'))
 	if request.method == 'POST':
 		apikeystring = '?apikey=ad7a38056f0a95dc24d6dfaa0fe3e0a5'
 		r_sales = requests.get('https://api.gilt.com/v1/sales/men/active.json' + apikeystring)
@@ -242,6 +369,8 @@ def pull_new_data():
 
 @app.route('/admin/update_inventory_status/', methods=['GET', 'POST'])
 def update_inventory_status():
+	if is_admin(request) == False:
+		return redirect(url_for('index'))
 	if request.method == 'POST':
 		
 		apikeystring = '?apikey=ad7a38056f0a95dc24d6dfaa0fe3e0a5'
@@ -290,6 +419,8 @@ def update_inventory_status():
 
 @app.route('/admin/update_available_products_list/', methods=['GET', 'POST'])
 def update_available_products_list():
+	if is_admin(request) == False:
+		return redirect(url_for('index'))
 	if request.method == 'POST':
 		
 		# --------------------------------

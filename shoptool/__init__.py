@@ -1,10 +1,30 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from datetime import datetime
 app = Flask(__name__)
 app.config.from_object('config')
 
+
 # NEW
 db = SQLAlchemy(app)
+
+class User(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	fbid = db.Column(db.Integer, unique=True, nullable=True)
+	email = db.Column(db.String(100), unique=True, nullable=True)
+	password = db.Column(db.String(100), nullable=True)
+	admin = db.Column(db.Boolean)
+	created_on = db.Column(db.DateTime)
+
+	def __init__(self, fbid, email, password, admin):
+		self.fbid = fbid
+		self.email = email
+		self.password = password
+		self.admin = admin
+		self.created_on = datetime.now()
+
+	def __repr__(self):
+		return '<User %r>' % self.id
 
 class AvailableProductCategory(db.Model):
 	id = db.Column(db.Integer, primary_key=True)

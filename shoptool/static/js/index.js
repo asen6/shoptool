@@ -8,6 +8,7 @@ var empty_product_list_text = 'No products found';
 // Page state
 var products = {};
 var product_ids = [];
+var login_dropdown_state = 'off';
 
 
 // Page ready handler
@@ -15,12 +16,37 @@ function init() {
 
 	// Set up event handlers
 	$("#get_products_btn").click(get_products_clicked);
+	$("#login_toggle").click(login_toggle_clicked);
+	$("#login_or_register_btn").click(login_or_register_clicked);
+	$("#logout_link").click(logout_clicked);
 
 	$("#input_category")[0].value = 'Jackets';
 	$("#input_min_price")[0].value = 0;
 	$("#input_max_price")[0].value = 1000;
+
+	check_if_logged_in();
 }
 $(document).ready(init);
+
+
+
+
+// --------------------------------------------
+// --------------------------------------------
+// 		EVENT HANDLERS
+// --------------------------------------------
+// --------------------------------------------
+
+function check_if_logged_in() {
+	var user_id = get_cookie('user_id');
+	if (user_id == null) {
+		show_login();
+		hide_logout();
+	} else {
+		show_logout();
+		hide_login();
+	}
+}
 
 function get_products_clicked(){
 	var input_category = escape($("#input_category")[0].value);
@@ -60,6 +86,61 @@ function get_products_clicked(){
 
 	
 }
+
+function login_toggle_clicked() {
+	if (login_dropdown_state == 'off') {
+		show_login_dropdown();
+	} else {
+		hide_login_dropdown();
+	}
+}
+
+
+function login_or_register_clicked() {
+	var raw_email = $("#input_email")[0].value;
+	var raw_password = $("#input_password")[0].value
+	var email = escape(raw_email);
+	var password = escape(raw_password);
+
+	login_request = $.getJSON(base_url + 'login_or_register/', 'email=' + email + '&password=' + password,
+		function(data, status, xhr) {
+			try {
+				console.log(data['return_data']['message']);
+			} catch (err) {
+				console.log('login successful');
+				show_logout();
+				hide_login();
+				$("#input_email")[0].value = '';
+				$("#input_password")[0].value = '';
+			}
+		})
+	.success(function() {})
+	.error(function() {console.log('Error - login_request');})
+	.complete(function() {});
+}
+
+
+function logout_clicked() {
+	logout_request = $.getJSON(base_url + 'logout/',
+		function(data, status, xhr) {
+			console.log('logged out');
+		})
+	.success(function() {})
+	.error(function() {console.log('Error - logout_request');})
+	.complete(function() {
+		show_login();
+		hide_logout();
+		$("#input_email")[0].value = '';
+		$("#input_password")[0].value = '';
+	});
+}
+
+
+// --------------------------------------------
+// --------------------------------------------
+// 		OTHER FUNCTIONS
+// --------------------------------------------
+// --------------------------------------------
 
 function rebuild_products_list(){
 	$('#products').empty();
@@ -107,6 +188,7 @@ function get_new_product_row_element(row_num){
 	new_product_row_element = document.createElement('div');
 	new_product_row_element.id = 'product_row_' + row_num;
 	$(new_product_row_element).addClass('row');
+	$(new_product_row_element).addClass('product_row');
 	return new_product_row_element;
 }
 
@@ -158,11 +240,51 @@ function product_to_dom(product){
 	return this_product;
 }
 
+function get_cookie(c_name) {
+	var i,x,y,ARRcookies=document.cookie.split(";");
+	for (i=0;i<ARRcookies.length;i++) {
+		x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+		y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+		x=x.replace(/^\s+|\s+$/g,"");
+		if (x==c_name) {
+			return unescape(y);
+		}
+	}
+}
 
 
+function show_login(){
+	console.log('showing login...');
+	$('#login_link_area').show();
+}
 
+function hide_login(){
+	console.log('hiding login...');
+	hide_login_dropdown();
+	$('#login_link_area').hide();
+}
 
+function show_login_dropdown() {
+	console.log('showing login dropdown...');
+	$('#login_dropdown_menu').show();
+	login_dropdown_state = 'on';
+}
 
+function hide_login_dropdown() {
+	console.log('hiding login dropdown...');
+	$('#login_dropdown_menu').hide();
+	login_dropdown_state = 'off';
+}
+
+function show_logout(){
+	console.log('showing logout...');
+	$('#logout_link_area').show();
+}
+
+function hide_logout(){
+	console.log('hiding logout...');
+	$('#logout_link_area').hide();
+}
 
 
 

@@ -38,7 +38,7 @@ body {
 .shoptool-navbar{}
 
 .shoptool-navbar-inner{
-	padding-left:10px;
+	/*padding-left:10px;*/
 }
 
 .shoptool_content_container{
@@ -64,6 +64,10 @@ body {
 }
 
 #products{}
+
+.product_row{
+	margin-bottom:10px;
+}
 
 .product{}
 
