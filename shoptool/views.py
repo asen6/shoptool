@@ -288,14 +288,20 @@ def pull_new_data():
 				print '--> added product.  product_count = ' + str(product_count)
 
 				# add categories
+				category_dups_list = []
 				if product_data.get('categories') is not None:
 					for category in product_data.get('categories'):
 						missing = gilt_category.query.filter(and_(gilt_category.gilt_product_id==new_product_id
 																, gilt_category.gilt_category==category)).first()
 						if missing is not None:
 							continue
+						
+						if category in category_dups_list:
+							continue
+						
 						new_category = gilt_category(category, new_product_id)
 						db.session.add(new_category)
+						category_dups_list.append(category)
 
 				# add image_urls
 				if product_data.get('image_urls') is not None:
